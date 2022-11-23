@@ -8,6 +8,13 @@ Repositories
 
 
 Installation
+
+- Clone the repo
+- (Optional) Create a virtual environment
+- Install requirements.txt
+- Run setup.py
+- Start server.py
+
 To start the Linus Service
 - Copy api_server.service file at /etc/systemd/system/
 - run 'chmod +x start.sh'
