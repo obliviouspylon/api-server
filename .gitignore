@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Repositories
+gas-price-notification/
+flights-in-radius/
+
 # C extensions
 *.so
 
