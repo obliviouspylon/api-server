@@ -81,12 +81,15 @@ flightsRadius = importlib.import_module("flights-in-radius.flights_in_radius")
 
 @app.route('/flights')
 def flightCheck():
-  if (request.method == 'GET') and (None != request.args.get('GPS_lon')) and (None != request.args.get('GPS_lat')):
-    GPS_lat = float(request.args.get('GPS_lat'))
-    GPS_lon = float(request.args.get('GPS_lon'))
-    return flightsRadius.main(GPS_lat,GPS_lon),200
-  else:
-    abort(400)
+    try:
+        if (request.method == 'GET') and (None != request.args.get('GPS_lon')) and (None != request.args.get('GPS_lat')):
+            GPS_lat = float(request.args.get('GPS_lat'))
+            GPS_lon = float(request.args.get('GPS_lon'))
+            return flightsRadius.main(GPS_lat,GPS_lon),200
+        else:
+            return("Please Provide GPS corrdinates as GPS_lon and GPS_lat.")
+    except:
+        abort(400)
 
 # Default
 @app.route('/')
