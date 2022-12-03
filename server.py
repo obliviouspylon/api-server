@@ -88,6 +88,10 @@ def flightCheck():
   else:
     abort(400)
 
+# Default
+@app.route('/')
+def redirect():
+    return redirect("https://jamesckluo.ca/")
 
 scheduler.start()
 if __name__ == '__main__':
