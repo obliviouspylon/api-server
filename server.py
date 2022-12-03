@@ -1,4 +1,4 @@
-from flask import Flask, Response, request, abort
+from flask import Flask, Response, request, abort, redirect
 from flask_cors import CORS
 from flask_apscheduler import APScheduler # https://viniciuschiele.github.io/flask-apscheduler/rst/usage.html https://www.techcoil.com/blog/how-to-use-flask-apscheduler-in-your-python-3-flask-application-to-run-multiple-tasks-in-parallel-from-a-single-http-request/
 from waitress import serve
@@ -90,7 +90,7 @@ def flightCheck():
 
 # Default
 @app.route('/')
-def redirect():
+def default_redirect():
     return redirect("https://jamesckluo.ca/")
 
 scheduler.start()
