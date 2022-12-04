@@ -46,10 +46,10 @@ def getGasPrediction():
         print("Updating Prediction")
         result = gas_gasWizard.getPrediction()
         if result[0]:
-            gas_jsonController.saveJson("GasWizard",result[1][0],result[1][1],result[1][2])
+            gas_jsonController.savePrediction("GasWizard",result[1][0],result[1][1],result[1][2])
         result = gas_Enpro680.getPrediction()
         if result[0]:
-            gas_jsonController.saveJson("EnPro",result[1][0],result[1][1],result[1][2])
+            gas_jsonController.savePrediction("EnPro",result[1][0],result[1][1],result[1][2])
         return("Prediction Updated")
     return("Prediction Not Updated")
 
@@ -57,7 +57,7 @@ def getGasPrediction():
 def sendPrediction():
     print("Sending Prediction")
     # message = gas_gasWizard.getPrediction()
-    data, tomorrow = gas_jsonController.checkJson(readData=True)
+    data, tomorrow = gas_jsonController.checkPrediction(readData=True)
     tomorrowDate = datetime.datetime.strptime(tomorrow, "%Y%m%d")
     message = ""
 
@@ -75,6 +75,19 @@ def sendPrediction():
     else:
         message = "Gas Prediction - " + tomorrowDate.strftime("%b %d") + "\n" + message
         return(message[:-1])
+
+@app.route('/gas/user',methods = ['POST', 'GET', "DELETE"])
+def manageUsers():
+    if request.method == 'GET':
+        print("Find Users")
+    elif request.method == 'POST':
+        print("Add User")
+    elif request.method == 'DELETE':
+        print("Remove User")
+    else:
+        print("Ignore")
+        return("")
+
 
 #---Flights in Radius---------------------------
 flightsRadius = importlib.import_module("flights-in-radius.flights_in_radius")
