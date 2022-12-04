@@ -76,14 +76,45 @@ def sendPrediction():
         message = "Gas Prediction - " + tomorrowDate.strftime("%b %d") + "\n" + message
         return(message[:-1])
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+userKey = os.getenv('USER_KEY')
+
 @app.route('/gas/user',methods = ['POST', 'GET', "DELETE"])
 def manageUsers():
+    content_type = request.headers.get('Content-Type')
+    if (content_type == 'application/json'):
+        reqJson = request.json
+    else:
+        print('Content-Type not supported!')
+        return ("")
+
+    if "Key" in reqJson:
+        if reqJson["Key"] != userKey:
+            return("")
+    else:
+        return("")
+
     if request.method == 'GET':
-        print("Find Users")
+        # print("Find Users")
+        return(";".join(gas_jsonController.readUsers()))
+        
     elif request.method == 'POST':
-        print("Add User")
+        # print("Add User")
+        number = reqJson["Number"]
+        if gas_jsonController.addUser(number):
+            return ("Successful")
+        else:
+            return ("Failed")
+
     elif request.method == 'DELETE':
-        print("Remove User")
+        # print("Remove User")
+        number = reqJson["Number"]
+        if gas_jsonController.deleteUser(number):
+            return ("Successful")
+        else:
+            return ("Failed")
     else:
         print("Ignore")
         return("")
