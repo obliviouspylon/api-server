@@ -96,6 +96,13 @@ def flightCheck():
 def default_redirect():
     return redirect("https://jamesckluo.ca/")
 
+@app.errorhandler(404)
+def path_not_found(e):
+    # your processing here
+    print("Someone tried a weird route: " + str(request.path))
+    return("")
+
+
 scheduler.start()
 if __name__ == '__main__':
     args = parser.parse_args()
