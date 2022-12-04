@@ -90,11 +90,11 @@ def manageUsers():
         print('Content-Type not supported!')
         return ("")
 
-    if "Key" in reqJson:
+    try:
         if reqJson["Key"] != userKey:
             return("")
-    else:
-        return("")
+    except:
+        return ("")
 
     if request.method == 'GET':
         # print("Find Users")
@@ -102,7 +102,10 @@ def manageUsers():
         
     elif request.method == 'POST':
         # print("Add User")
-        number = reqJson["Number"]
+        try:
+            number = reqJson["Number"]
+        except:
+            return ("")
         if gas_jsonController.addUser(number):
             return ("Successful")
         else:
@@ -110,7 +113,10 @@ def manageUsers():
 
     elif request.method == 'DELETE':
         # print("Remove User")
-        number = reqJson["Number"]
+        try:
+            number = reqJson["Number"]
+        except:
+            return ("")
         if gas_jsonController.deleteUser(number):
             return ("Successful")
         else:
