@@ -81,7 +81,7 @@ from dotenv import load_dotenv
 load_dotenv()
 userKey = os.getenv('USER_KEY')
 
-@app.route('/gas/user',methods = ['POST', 'GET', "DELETE"])
+@app.route('/gas/user',methods = ['POST', 'GET', 'PUT', "DELETE"])
 def manageUsers():
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
@@ -96,7 +96,7 @@ def manageUsers():
     except:
         return ("")
 
-    if request.method == 'GET':
+    if request.method == 'GET' or request.method == 'PUT':
         # print("Find Users")
         return(";".join(gas_jsonController.readUsers()))
         
