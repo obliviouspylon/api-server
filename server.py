@@ -26,7 +26,7 @@ listenOn = "0.0.0.0"
 gas_gasWizard = importlib.import_module("gas-price-notification.gasWizard")
 gas_jsonController = importlib.import_module("gas-price-notification.jsonController")
 gas_Enpro680 = importlib.import_module("gas-price-notification.Enpro680")
-gas_TextNow = gas_Enpro680 = importlib.import_module("gas-price-notification.TextNow")
+gas_TextNow = importlib.import_module("gas-price-notification.TextNow")
 
 def hourisbetween(start, end):
     now = datetime.datetime.now(timezone("EST")).hour
