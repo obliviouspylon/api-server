@@ -26,7 +26,7 @@ listenOn = "0.0.0.0"
 gas_gasWizard = importlib.import_module("gas-price-notification.gasWizard")
 gas_jsonController = importlib.import_module("gas-price-notification.jsonController")
 gas_Enpro680 = importlib.import_module("gas-price-notification.Enpro680")
-gas_TextNow = importlib.import_module("gas-price-notification.TextNow")
+gas_WhatsApp = importlib.import_module("gas-price-notification.WhatsApp")
 
 def hourisbetween(start, end):
     now = datetime.datetime.now(timezone("EST")).hour
@@ -82,9 +82,6 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 userKey = os.getenv('USER_KEY')
-tn_username = os.getenv('TEXTNOW_USERNAME')
-tn_sid = os.getenv('TEXTNOW_SID')
-tn_csrf = os.getenv('TEXTNOW_CSRF')
 
 @app.route('/gas/user',methods = ['POST', 'GET', 'PUT', "DELETE"])
 def manageUsers():
@@ -112,7 +109,6 @@ def manageUsers():
         except:
             return ("")
         if gas_jsonController.addUser(number):
-            gas_TextNow.send_sms(number,"Gas Price Notification. Number Added. To remove, please text STOP.", tn_username, tn_sid, tn_csrf)
             return ("Successful")
         else:
             return ("Failed")
@@ -124,7 +120,6 @@ def manageUsers():
         except:
             return ("")
         if gas_jsonController.deleteUser(number):
-            gas_TextNow.send_sms(number,"Gas Price Notification. Number Flagged for removal. Please give a few days for processing.", tn_username, tn_sid, tn_csrf)
             return ("Successful")
         else:
             return ("Failed")
@@ -132,34 +127,18 @@ def manageUsers():
         print("Ignore")
         return("")
 
-@app.route('/gas/textnow',methods = ['POST'])
-def textnow_update():
-    content_type = request.headers.get('Content-Type')
-    if (content_type == 'application/json'):
-        reqJson = request.json
-    else:
-        print('Content-Type not supported!')
-        return ("")
-
-    try:
-        if reqJson["Key"] != userKey:
-            return("")
-    except:
-        return ("")
-    
-    if "TEXTNOW_USERNAME" in reqJson:
-        tn_username = reqJson["TEXTNOW_USERNAME"]
-    if "TEXTNOW_SID" in reqJson:
-        tn_sid = reqJson["TEXTNOW_SID"]
-    if "TEXTNOW_CSRF" in reqJson:
-        tn_csrf = reqJson["TEXTNOW_CSRF"]
-    return("Done")
-
+whatsapp_phone_number_id = os.getenv('WHATSAPP_PHONE_NUMBER_ID') # Phone number ID provided
+whatsapp_access_token = os.getenv('WHATSAPP_ACCESS_TOKEN') # Your temporary access token
 
 @scheduler.task('interval', id='send_gas_SMS', minutes=130, misfire_grace_time=900)
-# @app.route('/textnow')
-def send_gas_prediction():
-    if hourisbetween(12, 21):
+@app.route('/gas/sendWhatsApp')
+def send_WhatsApp():
+
+    try:
+        force = request.args.get('force')
+    except:
+        force = "True"
+    if hourisbetween(12, 21) or force == "True":
         message = sendPrediction().replace("\n", ". ")
 
         try:
@@ -172,10 +151,36 @@ def send_gas_prediction():
             with open("gasPredictionMessage.txt","w") as f:
                 f.write(message)
             numbers = gas_jsonController.readUsers()
+
+            data, tomorrow = gas_jsonController.checkPrediction(readData=True)
+            tomorrowDate = datetime.datetime.strptime(tomorrow, "%Y%m%d")
+
+            if "EnPro" in data[tomorrow]:
+                Enpro_direction = str(data[tomorrow]["EnPro"]["direction"])
+                Enpro_amount = str(data[tomorrow]["EnPro"]["amount"])
+                Enpro_price = str(data[tomorrow]["EnPro"]["price"])
+            else:
+                Enpro_direction = "-"
+                Enpro_amount = "-"
+                Enpro_price = "-"
+
+            if "GasWizard" in data[tomorrow]:
+                GasWizard_direction = str(data[tomorrow]["EnPro"]["direction"])
+                GasWizard_amount = str(data[tomorrow]["EnPro"]["amount"])
+                GasWizard_price = str(data[tomorrow]["EnPro"]["price"])
+            else:
+                GasWizard_direction = "-"
+                GasWizard_amount = "-"
+                GasWizard_price = "-"
+
             for number in numbers:
                 time.sleep(random.randint(5,20))
-                gas_TextNow.send_sms(number,message, tn_username, tn_sid, tn_csrf)
-    return("")
+                gas_WhatsApp.sendGasMessage("1" + number, whatsapp_phone_number_id, whatsapp_access_token, tomorrowDate.strftime("%b %d"), Enpro_direction, Enpro_amount, Enpro_price, GasWizard_direction, GasWizard_amount, GasWizard_price)
+        else:
+            return("")
+    else:
+        return("")
+    return("Successful")
 
 #---Flights in Radius---------------------------
 flightsRadius = importlib.import_module("flights-in-radius.flights_in_radius")
