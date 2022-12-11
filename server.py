@@ -43,7 +43,7 @@ def getGasPrediction():
     try:
         force = request.args.get('force')
     except:
-        force = "True"
+        force = "False"
     if hourisbetween(9, 21) or force == "True":
         print("Updating Prediction")
         result = gas_gasWizard.getPrediction()
@@ -137,7 +137,7 @@ def send_WhatsApp():
     try:
         force = request.args.get('force')
     except:
-        force = "True"
+        force = "False"
     if hourisbetween(12, 21) or force == "True":
         message = sendPrediction().replace("\n", ". ")
 
