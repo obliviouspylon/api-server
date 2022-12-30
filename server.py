@@ -8,6 +8,7 @@ import datetime
 from pytz import timezone
 import time
 import random
+import taskerJoinSMS
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-p', default=9000, dest='port',
@@ -26,7 +27,6 @@ listenOn = "0.0.0.0"
 gas_gasWizard = importlib.import_module("gas-price-notification.gasWizard")
 gas_jsonController = importlib.import_module("gas-price-notification.jsonController")
 gas_Enpro680 = importlib.import_module("gas-price-notification.Enpro680")
-gas_WhatsApp = importlib.import_module("gas-price-notification.WhatsApp")
 
 def hourisbetween(start, end):
     now = datetime.datetime.now(timezone("EST")).hour
@@ -127,19 +127,19 @@ def manageUsers():
         print("Ignore")
         return("")
 
-whatsapp_phone_number_id = os.getenv('WHATSAPP_PHONE_NUMBER_ID') # Phone number ID provided
-whatsapp_access_token = os.getenv('WHATSAPP_ACCESS_TOKEN') # Your temporary access token
+tasker_join_api = os.getenv('TASKER_JOIN_API')
+tasker_join_device = os.getenv('TASKER_JOIN_DEVICE')
 
 @scheduler.task('interval', id='send_gas_SMS', minutes=130, misfire_grace_time=900)
-@app.route('/gas/sendWhatsApp')
-def send_WhatsApp():
+@app.route('/gas/sendPrediction')
+def send_Prediction():
 
     try:
         force = request.args.get('force')
     except:
         force = "False"
     if hourisbetween(12, 21) or force == "True":
-        message = sendPrediction().replace("\n", ". ")
+        message = sendPrediction()
 
         try:
             with open("gasPredictionMessage.txt","r") as f:
@@ -174,8 +174,8 @@ def send_WhatsApp():
                 GasWizard_price = "-"
 
             for number in numbers:
-                time.sleep(random.randint(5,20))
-                gas_WhatsApp.sendGasMessage("1" + number, whatsapp_phone_number_id, whatsapp_access_token, tomorrowDate.strftime("%b %d"), Enpro_direction, Enpro_amount, Enpro_price, GasWizard_direction, GasWizard_amount, GasWizard_price)
+                time.sleep(random.randint(5,10))
+                # gas_WhatsApp.sendGasMessage("1" + number, whatsapp_phone_number_id, whatsapp_access_token, tomorrowDate.strftime("%b %d"), Enpro_direction, Enpro_amount, Enpro_price, GasWizard_direction, GasWizard_amount, GasWizard_price)
         else:
             return("")
     else:
