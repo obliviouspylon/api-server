@@ -100,7 +100,7 @@ def manageUsers():
 
     if request.method == 'GET' or request.method == 'PUT':
         # print("Find Users")
-        return(";".join(gas_jsonController.readUsers()))
+        return(";".join(gas_jsonController.readUsers())) 
         
     elif request.method == 'POST':
         # print("Add User")
@@ -109,8 +109,11 @@ def manageUsers():
         except:
             return ("")
         if gas_jsonController.addUser(number):
+            taskerJoinSMS.sendSMS(tasker_join_api, tasker_join_device, number, "Success!\nText STOP to stop receiving predictions.")
+            taskerJoinSMS.sendSMS(tasker_join_api, tasker_join_device, number, sendPrediction())
             return ("Successful")
         else:
+            taskerJoinSMS.sendSMS(tasker_join_api, tasker_join_device, number, "Something went wrong. Please contact James")
             return ("Failed")
 
     elif request.method == 'DELETE':
@@ -120,8 +123,10 @@ def manageUsers():
         except:
             return ("")
         if gas_jsonController.deleteUser(number):
+            taskerJoinSMS.sendSMS(tasker_join_api, tasker_join_device, number, "Success!\nText STOP to stop receiving predictions.")
             return ("Successful")
         else:
+            taskerJoinSMS.sendSMS(tasker_join_api, tasker_join_device, number, "Something went wrong. Please contact James")
             return ("Failed")
     else:
         print("Ignore")
@@ -131,8 +136,8 @@ tasker_join_api = os.getenv('TASKER_JOIN_API')
 tasker_join_device = os.getenv('TASKER_JOIN_DEVICE')
 
 @scheduler.task('interval', id='send_gas_SMS', minutes=130, misfire_grace_time=900)
-@app.route('/gas/sendPrediction')
-def send_Prediction():
+@app.route('/gas/sendSMS')
+def sendSMS():
 
     try:
         force = request.args.get('force')
