@@ -123,7 +123,7 @@ def manageUsers():
         except:
             return ("")
         if gas_jsonController.deleteUser(number):
-            taskerJoinSMS.sendSMS(tasker_join_api, tasker_join_device, number, "Success!\nText STOP to stop receiving predictions.")
+            taskerJoinSMS.sendSMS(tasker_join_api, tasker_join_device, number, "You have been removed. Bye!")
             return ("Successful")
         else:
             taskerJoinSMS.sendSMS(tasker_join_api, tasker_join_device, number, "Something went wrong. Please contact James")
