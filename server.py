@@ -138,7 +138,7 @@ def send_Prediction():
         force = request.args.get('force')
     except:
         force = "False"
-    if hourisbetween(12, 21) or force == "True":
+    if hourisbetween(13, 21) or force == "True":
         message = sendPrediction()
 
         try:
@@ -150,32 +150,20 @@ def send_Prediction():
         if message != contents:
             with open("gasPredictionMessage.txt","w") as f:
                 f.write(message)
-            numbers = gas_jsonController.readUsers()
+            
+            try:
+                numbers = request.args.get('number')
+            except:
+                numbers = ""
 
-            data, tomorrow = gas_jsonController.checkPrediction(readData=True)
-            tomorrowDate = datetime.datetime.strptime(tomorrow, "%Y%m%d")
-
-            if "EnPro" in data[tomorrow]:
-                Enpro_direction = str(data[tomorrow]["EnPro"]["direction"])
-                Enpro_amount = str(data[tomorrow]["EnPro"]["amount"])
-                Enpro_price = str(data[tomorrow]["EnPro"]["price"])
+            if numbers == "" or numbers == None:
+                numbers = gas_jsonController.readUsers()
             else:
-                Enpro_direction = "-"
-                Enpro_amount = "-"
-                Enpro_price = "-"
-
-            if "GasWizard" in data[tomorrow]:
-                GasWizard_direction = str(data[tomorrow]["EnPro"]["direction"])
-                GasWizard_amount = str(data[tomorrow]["EnPro"]["amount"])
-                GasWizard_price = str(data[tomorrow]["EnPro"]["price"])
-            else:
-                GasWizard_direction = "-"
-                GasWizard_amount = "-"
-                GasWizard_price = "-"
+                numbers = {numbers:True}
 
             for number in numbers:
-                time.sleep(random.randint(5,10))
-                # gas_WhatsApp.sendGasMessage("1" + number, whatsapp_phone_number_id, whatsapp_access_token, tomorrowDate.strftime("%b %d"), Enpro_direction, Enpro_amount, Enpro_price, GasWizard_direction, GasWizard_amount, GasWizard_price)
+                taskerJoinSMS.sendSMS(tasker_join_api, tasker_join_device, number, message)
+                time.sleep(5)
         else:
             return("")
     else:
