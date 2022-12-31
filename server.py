@@ -109,7 +109,12 @@ def manageUsers():
         except:
             return ("")
         if gas_jsonController.addUser(number):
-            taskerJoinSMS.sendSMS(tasker_join_api, tasker_join_device, number, "Success!\nText STOP to stop receiving predictions.")
+            taskerJoinSMS.sendSMS(tasker_join_api, tasker_join_device, number,
+                                    """Success!\n
+                                    Text CHECK to get current prediction.\n
+                                    Text STOP to stop receiving predictions.\n
+                                    Contact James for questions.
+                                    """)
             taskerJoinSMS.sendSMS(tasker_join_api, tasker_join_device, number, sendPrediction())
             return ("Successful")
         else:
